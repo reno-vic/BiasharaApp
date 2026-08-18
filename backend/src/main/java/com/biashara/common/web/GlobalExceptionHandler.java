@@ -10,7 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -53,6 +55,12 @@ public class GlobalExceptionHandler {
                 .forEach(error -> fieldErrors.putIfAbsent(error.getField(), error.getDefaultMessage()));
         return ResponseEntity.badRequest().body(ApiError.validation(
                 HttpStatus.BAD_REQUEST.value(), "Please correct the highlighted fields", fieldErrors));
+    }
+
+    /** Malformed JSON and missing query parameters should remain client errors. */
+    @ExceptionHandler({HttpMessageNotReadableException.class, MissingServletRequestParameterException.class})
+    public ResponseEntity<ApiError> onMalformedRequest(Exception exception) {
+        return build(HttpStatus.BAD_REQUEST, "The request body or parameters could not be read");
     }
 
     /** Anything unmapped is a defect: log the stack trace, tell the caller nothing. */
