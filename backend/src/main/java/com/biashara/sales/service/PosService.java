@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -265,7 +266,7 @@ public class PosService {
 
     private PaymentMethod parseMethod(String raw) {
         try {
-            return PaymentMethod.valueOf(raw.toUpperCase());
+            return PaymentMethod.valueOf(raw.trim().toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException unknown) {
             throw new BusinessRuleException("Unknown payment method: " + raw);
         }
