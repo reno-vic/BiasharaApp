@@ -39,12 +39,13 @@ public class AiController {
     @Operation(summary = "Active insights, newest first")
     public List<AiDtos.InsightResponse> insights(@RequestParam(required = false) String module) {
         Long tenantId = currentUser.tenantId();
-        var found = module == null || module.isBlank()
+        String requestedModule = module == null ? null : module.trim();
+        var found = requestedModule == null || requestedModule.isBlank()
                 ? insightRepository
                 .findByTenantIdAndDismissedFalseAndDeletedFalseOrderByGeneratedAtDesc(tenantId)
                 : insightRepository
                 .findByTenantIdAndModuleAndDismissedFalseAndDeletedFalseOrderByGeneratedAtDesc(
-                        tenantId, module);
+                        tenantId, requestedModule);
 
         return found.stream().map(AiDtos.InsightResponse::from).toList();
     }
