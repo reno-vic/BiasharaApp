@@ -45,9 +45,10 @@ public class InventoryService {
     @Transactional
     public InventoryDtos.ProductResponse create(Long tenantId, Long actorId,
                                                 InventoryDtos.ProductRequest request) {
-        productRepository.findByTenantIdAndSkuAndDeletedFalse(tenantId, request.sku())
+        String sku = request.sku().trim();
+        productRepository.findByTenantIdAndSkuAndDeletedFalse(tenantId, sku)
                 .ifPresent(existing -> {
-                    throw new BusinessRuleException("SKU " + request.sku() + " is already in use");
+                    throw new BusinessRuleException("SKU " + sku + " is already in use");
                 });
 
         var tenant = tenantRepository.findById(tenantId)
@@ -55,7 +56,7 @@ public class InventoryService {
 
         Product product = Product.builder()
                 .tenant(tenant)
-                .sku(request.sku())
+                .sku(sku)
                 .barcode(request.barcode())
                 .name(request.name())
                 .description(request.description())
@@ -112,7 +113,7 @@ public class InventoryService {
         // A stock change through the edit form still has to hit the ledger.
         Integer previousStock = product.getCurrentStock();
 
-        product.setSku(request.sku());
+        product.setSku(request.sku().trim());
         product.setBarcode(request.barcode());
         product.setName(request.name());
         product.setDescription(request.description());
