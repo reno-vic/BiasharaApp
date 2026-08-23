@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -75,6 +76,7 @@ public class AiAssistantService {
 
     @Transactional
     public AiDtos.AnswerResponse ask(Long tenantId, Long userId, String question, String conversationId) {
+        String cleanQuestion = question.strip();
         String thread = conversationId == null || conversationId.isBlank()
                 ? UUID.randomUUID().toString()
                 : conversationId;
@@ -89,12 +91,12 @@ public class AiAssistantService {
                 .conversationId(thread)
                 .user(user)
                 .role("USER")
-                .content(question)
+                .content(cleanQuestion)
                 .sentAt(LocalDateTime.now())
                 .build());
 
-        Intent intent = classify(question);
-        AiDtos.AnswerResponse answer = compose(tenantId, thread, question, intent);
+        Intent intent = classify(cleanQuestion);
+        AiDtos.AnswerResponse answer = compose(tenantId, thread, cleanQuestion, intent);
 
         chatRepository.save(AiChatMessage.builder()
                 .tenant(tenant)
@@ -111,7 +113,7 @@ public class AiAssistantService {
 
     /** Keyword-based intent matching. Crude, but honest about what it is. */
     private Intent classify(String question) {
-        String text = question.toLowerCase();
+        String text = question.strip().toLowerCase(Locale.ROOT);
 
         if (contains(text, "profit") && contains(text, "fall", "drop", "down", "decrease", "why", "lower")) {
             return Intent.PROFIT_EXPLANATION;
