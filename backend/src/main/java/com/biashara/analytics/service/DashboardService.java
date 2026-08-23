@@ -263,7 +263,10 @@ public class DashboardService {
      * Evicts dashboard cache for a specific tenant when data changes.
      * Call this method after sales, expenses, or other dashboard-impacting operations.
      */
-    @CacheEvict(value = "dashboard", key = "#tenantId + '*'")
+    // Dashboard keys include user and permission context, so a wildcard key does
+    // not evict the related Caffeine entries. Clear the cache explicitly after a
+    // tenant-affecting write rather than serving stale KPIs.
+    @CacheEvict(value = "dashboard", allEntries = true)
     public void evictDashboardCache(Long tenantId) {
         log.info("Evicted dashboard cache for tenant: {}", tenantId);
     }
