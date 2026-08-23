@@ -534,6 +534,8 @@ public class AiAssistantService {
         return chatRepository
                 .findByTenantIdAndConversationIdAndDeletedFalseOrderBySentAtAsc(tenantId, conversationId)
                 .stream()
+                // Keep replay bounded if a long-running conversation is opened in the UI.
+                .limit(100)
                 .map(message -> new AiDtos.ChatMessageResponse(
                         message.getId(), message.getConversationId(), message.getRole(),
                         message.getContent(), message.getSentAt()))
