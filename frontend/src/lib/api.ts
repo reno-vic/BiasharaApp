@@ -59,19 +59,19 @@ api.interceptors.response.use(
 
     if (status === 401 && original && !original._retried && !isAuthCall && tokenStore.refresh()) {
       original._retried = true
+      const refreshPromise = refreshInFlight ?? (refreshInFlight = refreshAccessToken())
       try {
-        refreshInFlight = refreshInFlight ?? refreshAccessToken()
-        const token = await refreshInFlight
-        refreshInFlight = null
+        const token = await refreshPromise
         original.headers.Authorization = `Bearer ${token}`
         return api.request(original)
       } catch {
-        refreshInFlight = null
         tokenStore.clear()
         // Full reload so every store resets to a clean signed-out state.
         if (!window.location.pathname.startsWith('/login')) {
           window.location.href = '/login'
         }
+      } finally {
+        if (refreshInFlight === refreshPromise) refreshInFlight = null
       }
     }
     return Promise.reject(error)
