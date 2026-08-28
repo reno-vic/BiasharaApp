@@ -34,10 +34,19 @@ export default function AssistantPage() {
   const endRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    let active = true
     api
       .get<{ questions: string[] }>('/ai/suggested-questions')
-      .then(({ data }) => setSuggestions(data.questions))
-      .catch(() => setSuggestions([]))
+      .then(({ data }) => {
+        if (active) setSuggestions(data.questions)
+      })
+      .catch(() => {
+        if (active) setSuggestions([])
+      })
+
+    return () => {
+      active = false
+    }
   }, [])
 
   useEffect(() => {
