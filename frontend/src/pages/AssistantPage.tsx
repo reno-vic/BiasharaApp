@@ -220,12 +220,17 @@ export default function AssistantPage() {
               value={question}
               onChange={(event) => setQuestion(event.target.value)}
               placeholder="Why did profits fall? What should I reorder?"
+              aria-label="Ask the business assistant"
+              maxLength={500}
               disabled={thinking}
             />
             <Button type="submit" disabled={thinking || !question.trim()}>
               {thinking ? <Loader2 className="animate-spin" /> : <Send />}
             </Button>
           </form>
+          <p className="mt-1 text-right text-[10px] text-muted-foreground">
+            {question.length}/500
+          </p>
           <p className="mt-2 text-center text-[11px] text-muted-foreground">
             Rule-based over live queries — no language model, so no invented numbers.
             <Badge variant="muted" className="ml-2">
