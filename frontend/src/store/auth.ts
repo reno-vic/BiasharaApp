@@ -25,7 +25,7 @@ export const useAuth = create<AuthState>((set, get) => ({
   mustChangePassword: false,
 
   async login(email, password) {
-    const { data } = await api.post<LoginResponse>('/auth/login', { email, password })
+    const { data } = await api.post<LoginResponse>('/auth/login', { email: email.trim(), password })
     tokenStore.set(data.accessToken, data.refreshToken)
     set({ user: data.user, mustChangePassword: data.mustChangePassword, bootstrapping: false })
     return data
