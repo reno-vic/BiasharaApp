@@ -5,7 +5,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 export function LoadingRows({ rows = 5, className }: { rows?: number; className?: string }) {
   return (
-    <div className={className ?? 'space-y-3 p-5'} role="status" aria-label="Loading">
+    <div className={className ?? 'space-y-3 p-5'} role="status" aria-live="polite" aria-label="Loading">
       {Array.from({ length: rows }).map((_, index) => (
         <Skeleton key={index} className="h-4" style={{ width: `${96 - index * 11}%` }} />
       ))}
@@ -38,7 +38,10 @@ export function EmptyState({
 
 export function ErrorState({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
-    <div className="flex flex-col items-center justify-center px-6 py-12 text-center">
+    <div
+      className="flex flex-col items-center justify-center px-6 py-12 text-center"
+      role="alert"
+    >
       <div className="mb-3 rounded-full bg-destructive/10 p-3">
         <AlertCircle className="h-6 w-6 text-destructive" />
       </div>
