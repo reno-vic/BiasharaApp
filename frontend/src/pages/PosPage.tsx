@@ -123,6 +123,12 @@ export default function PosPage() {
       toast.error('A credit sale needs a customer account to bill')
       return
     }
+    const staleLine = cart.find((line) => line.quantity > line.product.currentStock)
+    if (staleLine) {
+      toast.error(`${staleLine.product.name} no longer has enough stock`)
+      products.reload()
+      return
+    }
 
     setSubmitting(true)
     try {
