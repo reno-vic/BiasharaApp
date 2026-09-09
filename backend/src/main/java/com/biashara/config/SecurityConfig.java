@@ -125,6 +125,7 @@ public class SecurityConfig {
                     "http://127.0.0.1:*");
         }
         return StringUtils.commaDelimitedListToSet(allowedOrigins).stream()
+                .map(String::trim)
                 .filter(StringUtils::hasText)
                 .toList();
     }
