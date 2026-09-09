@@ -86,6 +86,9 @@ export function errorMessage(error: unknown, fallback = 'Something went wrong'):
       const first = Object.values(body.fieldErrors)[0]
       if (first) return first
     }
+    if (error.response?.status === 429) {
+      return 'Too many requests. Please wait a moment and try again.'
+    }
     if (body?.message) return body.message
     if (error.code === 'ERR_NETWORK') {
       return 'Cannot reach the server. If using a free hosting tier, it might be waking up—please wait a minute and try again.'
